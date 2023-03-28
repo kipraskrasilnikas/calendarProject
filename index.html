@@ -1,87 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Calendar App</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-
-  <div id="container">
-    <div id="header">
-      <div id="monthDisplay"></div>
-      <div>
-        <button id="backButton">Back</button>
-        <button id="nextButton">Next</button>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="container">
+      <div id="header">
+        <div id="monthDisplay"></div>
+        <div>
+          <button id="backButton">Back</button>
+          <button id="nextButton">Next</button>
+        </div>
       </div>
+
+      <div id="weekdays">
+        <div>Monday</div>
+        <div>Tuesday</div>
+        <div>Wednesday</div>
+        <div>Thursday</div>
+        <div>Friday</div>
+        <div>Saturday</div>
+        <div>Sunday</div>
+      </div>
+
+      <div id="calendar"></div>
     </div>
 
-    <div id="weekdays">
-      <div>Monday</div>
-      <div>Tuesday</div>
-      <div>Wednesday</div>
-      <div>Thursday</div>
-      <div>Friday</div>
-      <div>Saturday</div>
-      <div>Sunday</div>
-    </div>
-      
-    <div id="calendar"></div>
-  </div>
+    <div id="eventBar">
+      <h2 id="eventHeader">New Event</h2>
+      <input
+        id="eventTitleInput"
+        placeholder="Event Title"
+        maxlength="50"
+        required
+      />
+      <div class="timeContainer">
+        <div class="startTimeBlock">
+          <p>Start time</p>
+          <input type="time" id="startTime" placeholder="Start Time" required />
+        </div>
 
-  <div id="eventBar">
-    <h2 id="eventHeader">New Event</h2>
-    <input id="eventTitleInput" placeholder="Event Title" maxLength="50" required/>
-    <div class="timeContainer">
-      <div class="startTimeBlock">
-        <p>
-          Start time
+        <div class="endTimeBlock">
+          <p>End time</p>
+          <input type="time" id="endTime" placeholder="End Time" required />
+        </div>
+        <p id="timeError" style="color: red">
+          Start time cannot be later than End time!
         </p>
-        <input type="time" id="startTime" placeholder="Start Time" required/>
       </div>
-     
-      <div class="endTimeBlock">
-        <p>
-          End time
-        </p>
-        <input type="time" id="endTime" placeholder="End Time" required/>
+
+      <div class="dropdown">
+        <select id="list">
+          <option style="background-color: #a287d0" value="meeting">
+            Meeting
+          </option>
+          <option style="background-color: #fab573" value="call">Call</option>
+          <option style="background-color: #58bae4" value="outOfOffice">
+            Out of office
+          </option>
+        </select>
       </div>
-      <p id="timeError" style="color: red">Start time cannot be later than End time!</p>
+
+      <br />
+
+      <input id="description" placeholder="Description" />
+      <button id="saveButton">Save</button>
+      <button id="cancelButton">Cancel</button>
+      <p id="errorTextInput" style="color: red">
+        The highlighted fields require input.
+      </p>
     </div>
-        
-    <div class="dropdown">
-      <select id="list">
-        <option style="background-color: #A287D0" value="meeting">Meeting</option>
-        <option style="background-color: #FAB573" value="call">Call</option>
-        <option style="background-color: #58bae4" value="outOfOffice">Out of office</option>
-      </select>
+
+    <div id="deleteEventModal">
+      <h2>Do you want to delete this event?</h2>
+
+      <p id="eventText"></p>
+      <p id="startTimeRead"></p>
+      <p id="endTimeRead"></p>
+      <p id="eventTypeRead"></p>
+      <p id="descriptionRead"></p>
+
+      <button id="deleteButton">Delete</button>
+      <button id="closeButton">Cancel</button>
     </div>
 
-    <br>
-
-    <input id="description" placeholder="Description"/>
-    <button id="saveButton">Save</button>
-    <button id="cancelButton">Cancel</button>
-    <p id = "errorTextInput" style="color: red">The highlighted fields require input.</p>
-  </div>
-    
-  <div id="deleteEventModal">
-    <h2>Do you want to delete this event?</h2>
-
-    <p id="eventText"></p>
-    <p id="startTimeRead"></p>
-    <p id="endTimeRead"></p>
-    <p id="eventTypeRead"></p>
-    <p id="descriptionRead"></p>
-
-    <button id="deleteButton">Delete</button>
-    <button id="closeButton">Cancel</button>
-  </div>
-
-  <div id="modalBackDrop"></div>
+    <div id="modalBackDrop"></div>
     <!-- write above -->
     <script src="./script.js"></script>
-</body>
+  </body>
 </html>
