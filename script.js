@@ -1,12 +1,13 @@
-let nav = 0;
-let clicked = null;
+// Offset to adjust the displayed month. Set to 0 to display the current month.
+let monthsOffset = 0;
+let dateClicked = null;
 
 let events = sessionStorage.getItem("events")
   ? JSON.parse(sessionStorage.getItem("events"))
   : [];
 
 const calendar = document.getElementById("calendar");
-const eventBar = document.getElementById("eventBar");
+const newEventBar = document.getElementById("eventBar");
 const deleteEventModal = document.getElementById("deleteEventModal");
 
 const backDrop = document.getElementById("modalBackDrop");
@@ -34,10 +35,14 @@ const weekdays = [
   "Sunday",
 ];
 
+/**
+ * Opens the event bar and displays the details of a created event or a form for a new event on the selected date 
+ * @param {Date} date - The date of the opened new event bar
+ */
 function openEventBar(date) {
-  clicked = date;
+  dateClicked = date;
 
-  const eventForDay = events.find((e) => e.date === clicked);
+  const eventForDay = events.find((e) => e.date === dateClicked);
 
   eventHeader.value = date;
   if (eventForDay) {
@@ -65,17 +70,21 @@ function openEventBar(date) {
     deleteEventModal.style.display = "block";
     backDrop.style.display = "block";
   } else {
-    eventBar.style.display = "block";
+    newEventBar.style.display = "block";
     document.getElementById("eventHeader").innerText =
-      "New event for " + clicked;
+      "New event for " + dateClicked;
   }
 }
 
-function load() {
+/**
+ * Initializes the calendar view by creating the days of the month,
+ * adding event listeners to the buttons, and rendering any existing events.
+ */
+function initializeCalendarView() {
   const dt = new Date();
 
-  if (nav !== 0) {
-    dt.setMonth(new Date().getMonth() + nav);
+  if (monthsOffset !== 0) {
+    dt.setMonth(new Date().getMonth() + monthsOffset);
   }
   const day = dt.getDate();
   const month = dt.getMonth();
@@ -111,7 +120,7 @@ function load() {
       const eventForDay = events.find((e) => e.date === dayString);
 
       //current day
-      if (i - paddingDays === day && nav === 0) {
+      if (i - paddingDays === day && monthsOffset === 0) {
         daySquare.id = "currentDay";
       }
 
@@ -132,10 +141,10 @@ function load() {
 
 function closeEventBar() {
   eventTitleInput.classList.remove("error");
-  eventBar.style.display = "none";
+  newEventBar.style.display = "none";
   deleteEventModal.style.display = "none";
   eventTitleInput.value = "";
-  clicked = null;
+  dateClicked = null;
   backDrop.style.display = "none";
 
   startTimeInput.value = "";
@@ -146,7 +155,7 @@ function closeEventBar() {
 
   errorText.style.display = "none";
 
-  load();
+  initializeCalendarView();
 }
 
 function saveEvent() {
@@ -167,7 +176,7 @@ function saveEvent() {
       timeErrorText.style.display = "block";
     } else {
       events.push({
-        date: clicked,
+        date: dateClicked,
         title: eventTitleInput.value,
         startTime: startTimeInput.value,
         endTime: endTimeInput.value,
@@ -191,19 +200,19 @@ function saveEvent() {
 
 function deleteEvent() {
   backDrop.style.display = "block";
-  events = events.filter((e) => e.date !== clicked);
+  events = events.filter((e) => e.date !== dateClicked);
   localStorage.setItem("events", JSON.stringify(events));
   closeEventBar();
 }
 
-function initButtons() {
+function initializeCalendarButtons() {
   document.getElementById("nextButton").addEventListener("click", () => {
-    nav++;
-    load();
+    monthsOffset++;
+    initializeCalendarView();
   });
   document.getElementById("backButton").addEventListener("click", () => {
-    nav--;
-    load();
+    monthsOffset--;
+    initializeCalendarView();
   });
 
   document.getElementById("saveButton").addEventListener("click", saveEvent);
@@ -218,5 +227,5 @@ function initButtons() {
     .getElementById("closeButton")
     .addEventListener("click", closeEventBar);
 }
-initButtons();
-load();
+initializeCalendarButtons();
+initializeCalendarView();
