@@ -1,3 +1,5 @@
+import constants from './constants.js';
+
 // Offset to adjust the displayed month. Set to 0 to display the current month.
 let monthsOffset = 0;
 let dateClicked = null;
@@ -25,7 +27,7 @@ const eventDescriptionInput = document.getElementById("description");
 
 const eventBackground = document.getElementById("event");
 
-const weekdays = [
+const WEEKDAYS = [
   "Monday",
   "Tuesday",
   "Wednesday",
@@ -56,21 +58,21 @@ function openEventBar(date) {
       "endTimeRead"
     ).innerText = `End Time: ${eventForDay.endTime}`;
 
-    if (eventForDay.eventType === "meeting") {
-      document.getElementById("eventTypeRead").innerText = "Type: Meeting";
-    } else if (eventForDay.eventType === "call") {
-      document.getElementById("eventTypeRead").innerText = "Type: Call";
-    } else if (eventForDay.eventType === "outOfOffice") {
-      document.getElementById("eventTypeRead").innerText =
+    if (eventForDay.eventType === constants.EVENT_TYPES.MEETING) {
+      document.getElementById(constants.ELEMENT_EVENT_TYPE_READ).innerText = "Type: Meeting";
+    } else if (eventForDay.eventType === constants.EVENT_TYPES.CALL) {
+      document.getElementById(constants.ELEMENT_EVENT_TYPE_READ).innerText = "Type: Call";
+    } else if (eventForDay.eventType === constants.EVENT_TYPES.OUT_OF_OFFICE) {
+      document.getElementById(constants.ELEMENT_EVENT_TYPE_READ).innerText =
         "Type: Out of Office";
     }
     document.getElementById(
       "descriptionRead"
     ).innerText = `Description: ${eventForDay.description}`;
-    deleteEventModal.style.display = "block";
-    backDrop.style.display = "block";
+    deleteEventModal.style.display = constants.BLOCK_STRING;
+    backDrop.style.display = constants.BLOCK_STRING;
   } else {
-    newEventBar.style.display = "block";
+    newEventBar.style.display = constants.BLOCK_STRING;
     document.getElementById("eventHeader").innerText =
       "New event for " + dateClicked;
   }
@@ -100,7 +102,7 @@ function initializeCalendarView() {
     day: "numeric",
   });
 
-  const paddingDays = weekdays.indexOf(dateString.split(", ")[0]);
+  const paddingDays = WEEKDAYS.indexOf(dateString.split(", ")[0]);
 
   document.getElementById("monthDisplay").innerText = `${dt.toLocaleDateString(
     "en-gb",
@@ -140,29 +142,29 @@ function initializeCalendarView() {
 }
 
 function closeEventBar() {
-  eventTitleInput.classList.remove("error");
-  newEventBar.style.display = "none";
-  deleteEventModal.style.display = "none";
+  eventTitleInput.classList.remove(constants.ERROR_STRING);
+  newEventBar.style.display = constants.NONE_STRING;
+  deleteEventModal.style.display = constants.NONE_STRING;
   eventTitleInput.value = "";
   dateClicked = null;
-  backDrop.style.display = "none";
+  backDrop.style.display = constants.NONE_STRING;
 
   startTimeInput.value = "";
   endTimeInput.value = "";
 
-  startTimeInput.classList.remove("error");
-  endTimeInput.classList.remove("error");
+  startTimeInput.classList.remove(constants.ERROR_STRING);
+  endTimeInput.classList.remove(constants.ERROR_STRING);
 
-  errorText.style.display = "none";
+  errorText.style.display = constants.NONE_STRING;
 
   initializeCalendarView();
 }
 
 function saveEvent() {
-  eventTitleInput.classList.remove("error");
-  startTimeInput.classList.remove("error");
-  endTimeInput.classList.remove("error");
-  eventType.classList.remove("error");
+  eventTitleInput.classList.remove(constants.ERROR_STRING);
+  startTimeInput.classList.remove(constants.ERROR_STRING);
+  endTimeInput.classList.remove(constants.ERROR_STRING);
+  eventType.classList.remove(constants.ERROR_STRING);
 
   if (
     eventTitleInput.value &&
@@ -171,9 +173,9 @@ function saveEvent() {
     eventType.value
   ) {
     if (startTimeInput.value > endTimeInput.value) {
-      startTimeInput.classList.add("error");
-      endTimeInput.classList.add("error");
-      timeErrorText.style.display = "block";
+      startTimeInput.classList.add(constants.ERROR_STRING);
+      endTimeInput.classList.add(constants.ERROR_STRING);
+      timeErrorText.style.display = constants.BLOCK_STRING;
     } else {
       events.push({
         date: dateClicked,
@@ -187,19 +189,19 @@ function saveEvent() {
       closeEventBar();
     }
   } else if (!eventTitleInput.value) {
-    eventTitleInput.classList.add("error");
-    errorText.style.display = "block";
+    eventTitleInput.classList.add(constants.ERROR_STRING);
+    errorText.style.display = constants.BLOCK_STRING;
   } else if (!startTimeInput.value) {
-    startTimeInput.classList.add("error");
-    errorText.style.display = "block";
+    startTimeInput.classList.add(constants.ERROR_STRING);
+    errorText.style.display = constants.BLOCK_STRING;
   } else if (!endTimeInput.value) {
-    endTimeInput.classList.add("error");
-    errorText.style.display = "block";
+    endTimeInput.classList.add(constants.ERROR_STRING);
+    errorText.style.display = constants.BLOCK_STRING;
   }
 }
 
 function deleteEvent() {
-  backDrop.style.display = "block";
+  backDrop.style.display = constants.BLOCK_STRING;
   events = events.filter((e) => e.date !== dateClicked);
   localStorage.setItem("events", JSON.stringify(events));
   closeEventBar();
