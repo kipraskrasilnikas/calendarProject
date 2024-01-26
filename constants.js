@@ -7,6 +7,15 @@ export default {
         MEETING: "meeting",
         CALL: "call",
         OUT_OF_OFFICE: "outOfOffice"
-    }
+    },
+    WEEKDAYS: [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday",
+    ]
 }
 

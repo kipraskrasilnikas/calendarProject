@@ -27,15 +27,6 @@ const eventDescriptionInput = document.getElementById("description");
 
 const eventBackground = document.getElementById("event");
 
-const WEEKDAYS = [
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-  "Sunday",
-];
 
 /**
  * Opens the event bar and displays the details of a created event or a form for a new event on the selected date 
@@ -102,7 +93,7 @@ function initializeCalendarView() {
     day: "numeric",
   });
 
-  const paddingDays = WEEKDAYS.indexOf(dateString.split(", ")[0]);
+  const paddingDays = constants.WEEKDAYS.indexOf(dateString.split(", ")[0]);
 
   document.getElementById("monthDisplay").innerText = `${dt.toLocaleDateString(
     "en-gb",
