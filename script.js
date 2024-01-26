@@ -1,195 +1,224 @@
-let nav = 0;
-let clicked = null;
+import constants from './constants.js';
 
-let events = sessionStorage.getItem('events') ? JSON.parse(sessionStorage.getItem('events')) : [];
+// Offset to adjust the displayed month. Set to 0 to display the current month.
+let monthsOffset = 0;
+let dateClicked = null;
 
-const calendar = document.getElementById('calendar');
-const eventBar = document.getElementById('eventBar');
-const deleteEventModal = document.getElementById('deleteEventModal');
+let events = sessionStorage.getItem("events")
+  ? JSON.parse(sessionStorage.getItem("events"))
+  : [];
 
-const backDrop = document.getElementById('modalBackDrop');
-const eventTitleInput = document.getElementById('eventTitleInput');
+const calendar = document.getElementById("calendar");
+const newEventBar = document.getElementById("eventBar");
+const deleteEventModal = document.getElementById("deleteEventModal");
 
-const startTimeInput = document.getElementById('startTime');
-const endTimeInput = document.getElementById('endTime');
+const backDrop = document.getElementById("modalBackDrop");
+const eventTitleInput = document.getElementById("eventTitleInput");
 
-const errorText = document.getElementById('errorTextInput');
-const timeErrorText = document.getElementById('timeError');
-const eventHeader = document.getElementById('eventHeader');
+const startTimeInput = document.getElementById("startTime");
+const endTimeInput = document.getElementById("endTime");
 
-const eventType = document.getElementById('list');
-const eventDescriptionInput = document.getElementById('description');
+const errorText = document.getElementById("errorTextInput");
+const timeErrorText = document.getElementById("timeError");
+const eventHeader = document.getElementById("eventHeader");
 
-const eventBackground = document.getElementById('event');
+const eventType = document.getElementById("list");
+const eventDescriptionInput = document.getElementById("description");
 
-const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+const eventBackground = document.getElementById("event");
 
-function openEventBar (date) {
-  clicked = date;
 
-  const eventForDay = events.find(e => e.date === clicked);
-  
+/**
+ * Opens the event bar and displays the details of a created event or a form for a new event on the selected date 
+ * @param {Date} date - The date of the opened new event bar
+ */
+function openEventBar(date) {
+  dateClicked = date;
+
+  const eventForDay = events.find((e) => e.date === dateClicked);
+
   eventHeader.value = date;
-  if(eventForDay) {
-    document.getElementById('eventText').innerText = `Title: ${eventForDay.title}`
-    document.getElementById('startTimeRead').innerText = `Start Time: ${eventForDay.startTime}`;
-    document.getElementById('endTimeRead').innerText = `End Time: ${eventForDay.endTime}`;
+  if (eventForDay) {
+    document.getElementById(
+      "eventText"
+    ).innerText = `Title: ${eventForDay.title}`;
+    document.getElementById(
+      "startTimeRead"
+    ).innerText = `Start Time: ${eventForDay.startTime}`;
+    document.getElementById(
+      "endTimeRead"
+    ).innerText = `End Time: ${eventForDay.endTime}`;
 
-    if(eventForDay.eventType === 'meeting'){
-      document.getElementById('eventTypeRead').innerText = "Type: Meeting";
-    } else if (eventForDay.eventType === 'call')
-    {
-      document.getElementById('eventTypeRead').innerText = "Type: Call";
-    } else if (eventForDay.eventType === 'outOfOffice')
-    {
-      document.getElementById('eventTypeRead').innerText = "Type: Out of Office";
+    if (eventForDay.eventType === constants.EVENT_TYPES.MEETING) {
+      document.getElementById(constants.ELEMENT_EVENT_TYPE_READ).innerText = "Type: Meeting";
+    } else if (eventForDay.eventType === constants.EVENT_TYPES.CALL) {
+      document.getElementById(constants.ELEMENT_EVENT_TYPE_READ).innerText = "Type: Call";
+    } else if (eventForDay.eventType === constants.EVENT_TYPES.OUT_OF_OFFICE) {
+      document.getElementById(constants.ELEMENT_EVENT_TYPE_READ).innerText =
+        "Type: Out of Office";
     }
-    document.getElementById('descriptionRead').innerText = `Description: ${eventForDay.description}`;
-    deleteEventModal.style.display = 'block';
-    backDrop.style.display = 'block';
-
+    document.getElementById(
+      "descriptionRead"
+    ).innerText = `Description: ${eventForDay.description}`;
+    deleteEventModal.style.display = constants.BLOCK_STRING;
+    backDrop.style.display = constants.BLOCK_STRING;
   } else {
-    eventBar.style.display = 'block';
-    document.getElementById('eventHeader').innerText = "New event for " + clicked;
+    newEventBar.style.display = constants.BLOCK_STRING;
+    document.getElementById("eventHeader").innerText =
+      "New event for " + dateClicked;
   }
 }
 
-function load() {
+/**
+ * Initializes the calendar view by creating the days of the month,
+ * adding event listeners to the buttons, and rendering any existing events.
+ */
+function initializeCalendarView() {
   const dt = new Date();
 
-  if (nav !== 0) {
-    dt.setMonth(new Date().getMonth() + nav);
+  if (monthsOffset !== 0) {
+    dt.setMonth(new Date().getMonth() + monthsOffset);
   }
   const day = dt.getDate();
   const month = dt.getMonth();
   const year = dt.getFullYear();
 
   const firstDayOfMonth = new Date(year, month, 1);
-  const daysInMonth = new Date(year, month+1, 0).getDate();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-  const dateString = firstDayOfMonth.toLocaleDateString('en-gb', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'numeric',
-    day: 'numeric',
-  })
-  
-  const paddingDays = weekdays.indexOf(dateString.split(', ')[0]);
+  const dateString = firstDayOfMonth.toLocaleDateString("en-gb", {
+    weekday: "long",
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+  });
 
-  document.getElementById('monthDisplay').innerText = `${dt.toLocaleDateString('en-gb', {month: 'long'})} ${year}`;
+  const paddingDays = constants.WEEKDAYS.indexOf(dateString.split(", ")[0]);
 
-  calendar.innerHTML = '';
+  document.getElementById("monthDisplay").innerText = `${dt.toLocaleDateString(
+    "en-gb",
+    { month: "long" }
+  )} ${year}`;
 
-  for(let i = 1; i <= paddingDays + daysInMonth; i++){
-    const daySquare = document.createElement('div');
-    daySquare.classList.add('day');
+  calendar.innerHTML = "";
+
+  for (let i = 1; i <= paddingDays + daysInMonth; i++) {
+    const daySquare = document.createElement("div");
+    daySquare.classList.add("day");
 
     const dayString = `${month + 1}/${i - paddingDays}/${year}`;
 
     if (i > paddingDays) {
       daySquare.innerText = i - paddingDays;
-      const eventForDay = events.find(e => e.date === dayString);
+      const eventForDay = events.find((e) => e.date === dayString);
 
       //current day
-      if (i - paddingDays === day && nav === 0) {
-        daySquare.id = 'currentDay';
+      if (i - paddingDays === day && monthsOffset === 0) {
+        daySquare.id = "currentDay";
       }
 
       if (eventForDay) {
-        const eventDiv = document.createElement('div');
-        eventDiv.classList.add('event');
+        const eventDiv = document.createElement("div");
+        eventDiv.classList.add("event");
         eventDiv.classList.add(eventForDay.eventType);
         eventDiv.innerText = eventForDay.title;
         daySquare.appendChild(eventDiv);
       }
-      daySquare.addEventListener('click', () => openEventBar(dayString));
-
+      daySquare.addEventListener("click", () => openEventBar(dayString));
     } else {
-      daySquare.classList.add('padding');
+      daySquare.classList.add("padding");
     }
     calendar.appendChild(daySquare);
   }
 }
 
 function closeEventBar() {
-  eventTitleInput.classList.remove('error');
-  eventBar.style.display = 'none';
-  deleteEventModal.style.display = 'none';
-  eventTitleInput.value = '';
-  clicked = null;
-  backDrop.style.display = 'none';
+  eventTitleInput.classList.remove(constants.ERROR_STRING);
+  newEventBar.style.display = constants.NONE_STRING;
+  deleteEventModal.style.display = constants.NONE_STRING;
+  eventTitleInput.value = "";
+  dateClicked = null;
+  backDrop.style.display = constants.NONE_STRING;
 
-  startTimeInput.value = '';
-  endTimeInput.value = '';
+  startTimeInput.value = "";
+  endTimeInput.value = "";
 
-  startTimeInput.classList.remove('error');
-  endTimeInput.classList.remove('error');
+  startTimeInput.classList.remove(constants.ERROR_STRING);
+  endTimeInput.classList.remove(constants.ERROR_STRING);
 
-  errorText.style.display = 'none';
+  errorText.style.display = constants.NONE_STRING;
 
-  load();
+  initializeCalendarView();
 }
 
 function saveEvent() {
+  eventTitleInput.classList.remove(constants.ERROR_STRING);
+  startTimeInput.classList.remove(constants.ERROR_STRING);
+  endTimeInput.classList.remove(constants.ERROR_STRING);
+  eventType.classList.remove(constants.ERROR_STRING);
 
-  eventTitleInput.classList.remove('error');
-  startTimeInput.classList.remove('error');
-  endTimeInput.classList.remove('error');
-  eventType.classList.remove('error');
-
-  if (eventTitleInput.value && startTimeInput.value && endTimeInput.value && eventType.value) {
-
-    if(startTimeInput.value > endTimeInput.value){
-      startTimeInput.classList.add('error');
-      endTimeInput.classList.add('error');
-      timeErrorText.style.display = 'block';
+  if (
+    eventTitleInput.value &&
+    startTimeInput.value &&
+    endTimeInput.value &&
+    eventType.value
+  ) {
+    if (startTimeInput.value > endTimeInput.value) {
+      startTimeInput.classList.add(constants.ERROR_STRING);
+      endTimeInput.classList.add(constants.ERROR_STRING);
+      timeErrorText.style.display = constants.BLOCK_STRING;
     } else {
       events.push({
-        date: clicked,
+        date: dateClicked,
         title: eventTitleInput.value,
         startTime: startTimeInput.value,
         endTime: endTimeInput.value,
         eventType: eventType.value,
         description: eventDescriptionInput.value,
       });
-      sessionStorage.setItem('events', JSON.stringify(events));
+      sessionStorage.setItem("events", JSON.stringify(events));
       closeEventBar();
     }
   } else if (!eventTitleInput.value) {
-    eventTitleInput.classList.add('error');
-    errorText.style.display = 'block';
-  } else if (!startTimeInput.value){
-    startTimeInput.classList.add('error');
-    errorText.style.display = 'block';
-  } else if (!endTimeInput.value){
-    endTimeInput.classList.add('error');
-    errorText.style.display = 'block';
+    eventTitleInput.classList.add(constants.ERROR_STRING);
+    errorText.style.display = constants.BLOCK_STRING;
+  } else if (!startTimeInput.value) {
+    startTimeInput.classList.add(constants.ERROR_STRING);
+    errorText.style.display = constants.BLOCK_STRING;
+  } else if (!endTimeInput.value) {
+    endTimeInput.classList.add(constants.ERROR_STRING);
+    errorText.style.display = constants.BLOCK_STRING;
   }
 }
 
 function deleteEvent() {
-  backDrop.style.display = 'block';
-  events = events.filter(e => e.date !== clicked);
-  localStorage.setItem('events', JSON.stringify(events));
+  backDrop.style.display = constants.BLOCK_STRING;
+  events = events.filter((e) => e.date !== dateClicked);
+  localStorage.setItem("events", JSON.stringify(events));
   closeEventBar();
 }
 
-function initButtons() {
-  document.getElementById('nextButton').addEventListener('click', () => {
-    nav++;
-    load();
+function initializeCalendarButtons() {
+  document.getElementById("nextButton").addEventListener("click", () => {
+    monthsOffset++;
+    initializeCalendarView();
   });
-  document.getElementById('backButton').addEventListener('click', () => {
-    nav--;
-    load();
+  document.getElementById("backButton").addEventListener("click", () => {
+    monthsOffset--;
+    initializeCalendarView();
   });
 
-  document.getElementById('saveButton').addEventListener('click', saveEvent);
-  document.getElementById('cancelButton').addEventListener('click', closeEventBar);
+  document.getElementById("saveButton").addEventListener("click", saveEvent);
+  document
+    .getElementById("cancelButton")
+    .addEventListener("click", closeEventBar);
 
-  document.getElementById('deleteButton').addEventListener('click', deleteEvent);
-  document.getElementById('closeButton').addEventListener('click', closeEventBar);
-
+  document
+    .getElementById("deleteButton")
+    .addEventListener("click", deleteEvent);
+  document
+    .getElementById("closeButton")
+    .addEventListener("click", closeEventBar);
 }
-initButtons();
-load();
+initializeCalendarButtons();
+initializeCalendarView();
